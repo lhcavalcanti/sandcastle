@@ -953,6 +953,23 @@ const [reviewA, reviewB] = await Promise.all([
 
 `fork` is present only on results from providers with `sessionStorage` (Claude Code, Codex) — hence the optional-chaining call. The same single-iteration and session-file constraints as `.resume()` apply.
 
+### `CopilotOptions`
+
+The `copilot()` factory accepts optional runtime controls:
+
+```typescript
+agent: copilot("gpt-5.6-sol", {
+  effort: "high",
+  context: "long_context",
+});
+```
+
+| Option    | Type                                                                                 | Default | Description                                      |
+| --------- | ------------------------------------------------------------------------------------ | ------- | ------------------------------------------------ |
+| `effort`  | `"none"` \| `"minimal"` \| `"low"` \| `"medium"` \| `"high"` \| `"xhigh"` \| `"max"` | —       | Copilot CLI reasoning effort                     |
+| `context` | `"default"` \| `"long_context"`                                                      | —       | Copilot CLI context-window tier                  |
+| `env`     | `Record<string, string>`                                                             | `{}`    | Environment variables injected into the provider |
+
 ### `ClaudeCodeOptions`
 
 The `claudeCode()` factory accepts an optional second argument for provider-specific options:
