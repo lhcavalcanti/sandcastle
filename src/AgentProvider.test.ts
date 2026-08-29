@@ -1681,6 +1681,35 @@ describe("copilot factory", () => {
     expect(command).toContain("--effort high");
   });
 
+  it("supports every Copilot effort level", () => {
+    for (const effort of [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max",
+    ] as const) {
+      const provider = copilot("gpt-5.6-sol", { effort });
+      expect(provider.buildPrintCommand(opts("test")).command).toContain(
+        `--effort ${effort}`,
+      );
+    }
+  });
+
+  it("applies the context tier to print and interactive commands", () => {
+    const provider = copilot("gpt-5.6-sol", {
+      context: "long_context",
+    });
+    expect(provider.buildPrintCommand(opts("test")).command).toContain(
+      "--context long_context",
+    );
+    expect(provider.buildInteractiveArgs!(opts("test"))).toEqual(
+      expect.arrayContaining(["--context", "long_context"]),
+    );
+  });
+
   it("buildPrintCommand omits --effort when not specified", () => {
     const provider = copilot("claude-sonnet-4.5");
     const { command } = provider.buildPrintCommand(opts("test"));

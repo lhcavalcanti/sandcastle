@@ -1101,7 +1101,16 @@ const parseCopilotStreamLine = (line: string): ParsedStreamEvent[] => {
 /** Options for the GitHub Copilot CLI agent provider. */
 export interface CopilotOptions {
   /** Reasoning effort level. Maps to the CLI's --effort flag. */
-  readonly effort?: "low" | "medium" | "high";
+  readonly effort?:
+    | "none"
+    | "minimal"
+    | "low"
+    | "medium"
+    | "high"
+    | "xhigh"
+    | "max";
+  /** Context window tier. Maps to the CLI's --context flag. */
+  readonly context?: "default" | "long_context";
   /** Environment variables injected by this agent provider. */
   readonly env?: Record<string, string>;
 }
@@ -1127,13 +1136,16 @@ export const copilot = (
     assertCopilotPrintPromptFitsArgv(prompt);
     const allowAll = dangerouslySkipPermissions ? " --allow-all-tools" : "";
     const effortFlag = options?.effort ? ` --effort ${options.effort}` : "";
+    const contextFlag = options?.context ? ` --context ${options.context}` : "";
     return {
-      command: `copilot -p ${shellEscape(prompt)} --output-format json --model ${shellEscape(model)}${allowAll}${effortFlag}`,
+      command: `copilot -p ${shellEscape(prompt)} --output-format json --model ${shellEscape(model)}${allowAll}${effortFlag}${contextFlag}`,
     };
   },
 
   buildInteractiveArgs({ prompt }: AgentCommandOptions): string[] {
     const args = ["copilot", "--model", model];
+    if (options?.effort) args.push("--effort", options.effort);
+    if (options?.context) args.push("--context", options.context);
     // Seed the interactive session with `-i`/`--interactive`, NOT `-p`. The
     // `-p`/`--prompt` flag runs the prompt programmatically and exits after
     // completion; since interactive() attaches these args to the real TTY,
